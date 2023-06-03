@@ -1,20 +1,24 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pandas_datareader as data
 import streamlit as st
+import yfinance as yf
 
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import load_model
+yf.pdr_override()
 #df.head()
 #print(datetime.today().strftime('%Y-%m-%d'))
 start='2012-01-01'
 end=str(datetime.today().strftime('%Y-%m-%d'))
+tomorrow = datetime.now() + timedelta(1)
 st.title('Stock Trend Prediction')
 user_input=st.text_input('Enter stock ticker','AAPL')
 
-df=data.DataReader(user_input,'stooq',start,end)
+#df=data.DataReader(user_input,'stooq',start,end)
+df=yf.download(user_input,start,end)
 df=df.reset_index()
 df=df.drop('Date',axis=1)
 st.subheader(f'Data from 2012-01-01 to {end}')
@@ -80,4 +84,5 @@ st.pyplot(fig2)
 #print("tu joothi",y_test[-1])
 cx=np.array([x_test[-1]])
 p=model.predict(cx)
-st.subheader(f'Price predicted for tomorrow is:{p*scale_factor}')
+tomorrow= tomorrow.strftime('%d-%m-%Y')
+st.subheader(f'Closing Price predicted for {tomorrow} is:{p*scale_factor}')
